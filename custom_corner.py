@@ -7,6 +7,7 @@ import matplotlib as mpl
 import matplotlib.colors as mplcolors
 import numpy as np
 import matplotlib.ticker as mtik
+from utils import _color_ax_to_white
 import types
 try:
     import scipy.ndimage
@@ -1223,3 +1224,31 @@ def __isstr(s):
         return isinstance(s, basestring)
     except NameError:
         return isinstance(s, str)
+
+
+
+def plot_custom_corner(
+        chains, ylim_ranges=None, **kwargs
+):
+    fig = plotGTC(chains, **kwargs)
+    axes = fig.get_axes()
+
+    # change all axes spines, ticks labels to white
+    for ax in axes:
+        _color_ax_to_white(ax)
+
+    # get all the diagonal axes (axes6,7,8,9) out of 10 axes
+    axes = axes[6:10]
+    # remove spines from the axes
+    for i, ax in enumerate(axes):
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.tick_params(axis='both', which='both', length=0)
+        if ylim_ranges is not None:
+            ax.set_ylim(*ylim_ranges[i])
+
+    # other than the axes. set rest of figure background to transparent
+    fig.patch.set_facecolor('none')
+
+    return fig
